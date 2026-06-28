@@ -92,6 +92,43 @@ O(rHW)
 
 time.
 
+### 3.4 Forward Energy Seam Carving
+
+The original backward-energy method only considers the energy of the seam being removed. Forward energy instead estimates the new visual discontinuity introduced after removing a seam.
+
+For a vertical seam, the DP transition considers three possible previous positions and adds a direction-dependent cost:
+
+\[
+DP[i][j]=
+E[i][j]+
+\min
+\begin{cases}
+DP[i-1][j-1]+C_L(i,j),\\
+DP[i-1][j]+C_U(i,j),\\
+DP[i-1][j+1]+C_R(i,j).
+\end{cases}
+\]
+
+This extension is still a dynamic programming algorithm, but the objective function is more aware of the effect of removing pixels.
+
+### 3.5 Mask-based Object Protection and Removal
+
+The project also supports simple mask-based energy modification.
+
+For object protection, pixels inside the mask receive a large positive energy penalty:
+
+\[
+E'(i,j)=E(i,j)+\lambda.
+\]
+
+For object removal, pixels inside the mask receive a large negative energy penalty:
+
+\[
+E'(i,j)=E(i,j)-\lambda.
+\]
+
+The same seam-search algorithm is then applied to the modified energy map.
+
 ---
 
 ## Planned Experiments
@@ -132,7 +169,17 @@ python experiments/run_single_image.py --input data/input/astronaut.png --target
 Run batch experiments:
 
 ```bash
-python experiments/run_batch.py --target-width-ratio 0.75 --methods standard dp greedy
+python experiments/run_batch.py --target-width-ratio 0.75 --methods standard dp forward greedy
+```
+
+Run protection mask demo:
+```bash
+python experiments/run_mask_demo.py --input data/input/astronaut.png --target-width 360 --mode protect --rect 170 40 340 330 --method forward
+```
+
+Run removal mask demo:
+```bash
+python experiments/run_mask_demo.py --input data/input/astronaut.png --target-width 360 --mode remove --rect 250 250 340 360 --method dp
 ```
 
 Run runtime analysis:
@@ -197,15 +244,13 @@ cs240-seam-carving/
 
 ---
 
-## 9. Current Status
+## Current Status
 
-* [x] Topic selected
-* [x] Proposal drafted
-* [x] Repository setup
-* [ ] Energy function implementation
-* [ ] DP seam search implementation
-* [ ] Greedy baseline implementation
-* [ ] Standard resize baseline
-* [ ] Experiments
-* [ ] Final report
-* [ ] Presentation slides
+- [x] Dynamic programming seam carving
+- [x] Greedy baseline
+- [x] Standard resize baseline
+- [x] Forward energy seam carving
+- [x] Mask-based object protection/removal
+- [ ] Final experiment selection
+- [ ] Final report
+- [ ] Presentation slides

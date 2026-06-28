@@ -1,0 +1,3 @@
+image,method,mode,target_width,elapsed_seconds,removed_seams
+astronaut.png,forward,no_mask,360,66.01671999999962,152
+astronaut.png,forward,protect,360,93.16022139999768,152

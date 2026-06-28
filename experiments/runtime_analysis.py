@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input", type=str, required=True)
     parser.add_argument("--table-dir", type=str, default="results/tables")
     parser.add_argument("--fig-dir", type=str, default="results/figures")
-    parser.add_argument("--methods", nargs="+", default=["dp", "greedy"])
+    parser.add_argument("--methods", nargs="+", default=["dp", "forward", "greedy"])
     parser.add_argument("--max-size", type=int, default=512)
     return parser.parse_args()
 

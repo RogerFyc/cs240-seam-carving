@@ -24,7 +24,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fig-dir", type=str, default="results/figures")
     parser.add_argument("--table-dir", type=str, default="results/tables")
     parser.add_argument("--target-width-ratio", type=float, default=0.75)
-    parser.add_argument("--methods", nargs="+", default=["standard", "dp", "greedy"])
+    parser.add_argument(
+        "--methods",
+        nargs="+",
+        default=["standard", "dp", "forward", "greedy"],
+        choices=["standard", "dp", "forward", "greedy"],
+    )
     return parser.parse_args()
 
 
@@ -38,7 +43,9 @@ def main() -> None:
 
     image_paths = list_images(input_dir)
     if not image_paths:
-        raise FileNotFoundError(f"No images found in {input_dir}. Run experiments/make_sample_data.py first.")
+        raise FileNotFoundError(
+            f"No images found in {input_dir}. Run experiments/make_sample_data.py first."
+        )
 
     all_records = []
 
@@ -56,7 +63,8 @@ def main() -> None:
                 start = time.perf_counter()
                 out = standard_resize(image, target_width=target_width, target_height=target_height)
                 elapsed = time.perf_counter() - start
-            elif method in {"dp", "greedy"}:
+                removed_seams = 0
+            else:
                 result = carve_to_size(
                     image,
                     target_width=target_width,
@@ -66,8 +74,7 @@ def main() -> None:
                 )
                 out = result.image
                 elapsed = result.elapsed_seconds
-            else:
-                raise ValueError(f"Unknown method: {method}")
+                removed_seams = result.removed_seams
 
             out_path = output_dir / f"{image_path.stem}_{method}_{target_width}x{target_height}.png"
             save_image(out, out_path)
@@ -82,6 +89,7 @@ def main() -> None:
                 "target_height": target_height,
                 "output_width": ow,
                 "output_height": oh,
+                "removed_seams": removed_seams,
                 "elapsed_seconds": elapsed,
             })
 

@@ -22,7 +22,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input", type=str, required=True, help="Path to input image.")
     parser.add_argument("--target-width", type=int, default=None)
     parser.add_argument("--target-height", type=int, default=None)
-    parser.add_argument("--methods", nargs="+", default=["all"], choices=["all", "standard", "dp", "greedy"])
+    parser.add_argument(
+        "--methods",
+        nargs="+",
+        default=["all"],
+        choices=["all", "standard", "dp", "forward", "greedy"],
+    )
     parser.add_argument("--output-dir", type=str, default="data/output")
     parser.add_argument("--fig-dir", type=str, default="results/figures")
     parser.add_argument("--table-dir", type=str, default="results/tables")
@@ -34,7 +39,7 @@ def main() -> None:
 
     methods = args.methods
     if "all" in methods:
-        methods = ["standard", "dp", "greedy"]
+        methods = ["standard", "dp", "forward", "greedy"]
 
     image_path = Path(args.input)
     image = load_image(image_path)
@@ -61,6 +66,7 @@ def main() -> None:
             start = time.perf_counter()
             out = standard_resize(image, target_width=target_width, target_height=target_height)
             elapsed = time.perf_counter() - start
+            removed_seams = 0
         else:
             result = carve_to_size(
                 image,
@@ -71,6 +77,7 @@ def main() -> None:
             )
             out = result.image
             elapsed = result.elapsed_seconds
+            removed_seams = result.removed_seams
 
         out_path = output_dir / f"{base_name}_{method}_{target_width}x{target_height}.png"
         save_image(out, out_path)
@@ -85,6 +92,7 @@ def main() -> None:
             "target_height": target_height,
             "output_width": ow,
             "output_height": oh,
+            "removed_seams": removed_seams,
             "elapsed_seconds": elapsed,
         })
 

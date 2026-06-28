@@ -1,4 +1,0 @@
-image,method,original_width,original_height,target_width,target_height,output_width,output_height,elapsed_seconds
-astronaut.png,standard,512,512,360,512,360,512,0.0062575000047218055
-astronaut.png,dp,512,512,360,512,360,512,77.66776109999046
-astronaut.png,greedy,512,512,360,512,360,512,2.84814639997785
